@@ -174,6 +174,7 @@ export default class ListContacts extends React.Component {
                 {peopleSoft:{
                       'function':'employee',
                       'employeeName': this.state.search,
+                      "msgID":"1231312",
                       'pageSize': '10',
                       'pageNumber': this.state.page
                           }

@@ -14,6 +14,8 @@ import {
 import { Avatar } from 'react-native-elements';
 import ActionBar from './ActionBar';
 
+
+  
 export default class ContactDetail extends Component {
     constructor(props){
         super(props);
@@ -56,49 +58,39 @@ export default class ContactDetail extends Component {
       
       <Avatar
         large
-        rounded
+        
         title = {avatar}
         onPress={() => console.log("Works!")}
         activeOpacity={0.7}
-        
         containerStyle={{marginTop: 30,marginBottom : 10}}
       />
-      <Text style={styles.appname}>
-      {name}
-      </Text>
-      <Text style={{color:'grey'}}>
-      {position}
-      </Text>
-      <Text style={{color:'grey'}}>
-      {department}
-      </Text>
+      <Text style={styles.appname}>{name}</Text>
+      <Text style={{color:'grey'}}>{position}</Text>
+      <Text style={{color:'grey'}}>{department}</Text>
       <ActionBar mobilePhone={phonenumber} email={email} />
       </View>
-      <View style={styles.emptyList}>
-      <Text style={styles.content}>
-      phone
-      </Text>
-      <TouchableOpacity onPress={() => this.callNumber(phonenumber)}>
-      <Text style={styles.detail}>
-      {phonenumber}
-      </Text>
-      </TouchableOpacity >
-      <Text style={styles.content}>
-      work phone
-      </Text>
-      <TouchableOpacity onPress={() => this.callNumber(workphone)}  >
-      <Text style={styles.detail}>
-      {workphone}
-      </Text>
-      </TouchableOpacity>
-      <Text style={styles.content}>
-      email
-      </Text>
-      <TouchableOpacity  onPress={() => this.sendMail(email)}>
-      <Text style={styles.detail}>
-      {email}
-      </Text>
-      </TouchableOpacity>
+            <View style={styles.emptyList}>
+                    <View style={styles.list_container} >
+                <Text style={styles.content}>phone</Text>
+                <TouchableOpacity onPress={() => this.callNumber(phonenumber)}>
+                    <Text style={styles.detail}>{phonenumber}</Text>
+                </TouchableOpacity >
+                    </View>
+                        <View style={styles.separator}/>
+                    <View style={styles.list_container} >
+                <Text style={styles.content}>work phone</Text>
+                <TouchableOpacity onPress={() => this.callNumber(workphone)}  >
+                    <Text style={styles.detail}>{workphone}</Text>
+                </TouchableOpacity>
+                </View>
+                        <View style={styles.separator}/>
+                <View style={styles.list_container} >
+                <Text style={styles.content}>email</Text>
+                <TouchableOpacity  onPress={() => this.sendMail(email)}>
+                    <Text style={styles.detail}>{email}</Text>
+                </TouchableOpacity>
+                </View>
+                        <View style={styles.separator}/>
               </View>
       </View>
     );
@@ -124,13 +116,6 @@ const styles = StyleSheet.create({
     width: 200,
     height: 100
   },
-  row:{
-      //borderBottomColor : 'grey',
-      borderBottomWidth : 0.1,
-      height: 200,
-      flexDirection:'row'
-      
-  },
   emptyList: {
     flex: 1
 },
@@ -150,23 +135,34 @@ const styles = StyleSheet.create({
 
    content: {
     fontSize: 16,
-    paddingTop: 10,
+    paddingTop: 5,
     paddingBottom: 5,
     paddingLeft: 10,
-    justifyContent: 'center',
-    alignItems:'center',
+    //justifyContent: 'center',
+    //alignItems:'center',
     color:'black'
+   },
+   separator: {
+    paddingLeft: 10,
+    paddingRight:10,
+    margin:10,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: '#AAAAAA',
+        },
+
+   list_container: {
+    height: 50,
+    flexDirection: 'column',
    },
 
    detail: {
     fontSize: 16,
-    paddingBottom: 10,
+    paddingBottom: 5,
     paddingLeft: 15,
-    justifyContent: 'center',
-    alignItems:'center',
+    //justifyContent: 'center',
+    //alignItems:'center',
     color:'#4F8EF7',
-    borderBottomColor: 'black',
-    borderBottomWidth: 1
+    
    },
   label:{
       fontSize:15

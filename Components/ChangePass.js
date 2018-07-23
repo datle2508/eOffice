@@ -12,7 +12,6 @@ import { Button, View, Text,
 import {icon} from 'react-native-vector-icons' ;
 import { List,ListItem} from 'react-native-elements';
 
-
 type Props = {};
 
 
