@@ -26,18 +26,13 @@ const optionalConfigObject = {
     super(props);
     isLoggedIn: false
     this.toggleSwitch = this.toggleSwitch.bind(this);
-    this.state={Username:'',password:'',showPassword: true}
+    this.state={Username:'',password:'',showPassword: true,finger:false}
     this.arrayholder = [] ;
     
 }
-
-
   toggleSwitch() {
     this.setState({ showPassword: !this.state.showPassword });
   }
-
-
-
 
   _onPressButton() {
     const { Username, password } = this.state;
@@ -91,11 +86,21 @@ const optionalConfigObject = {
       });
     
 }
+componentWillReceiveProps(nextProps) {
+  if (nextProps.navigation.state.params.token) {
+    this.componentDidMount();
+  }
+}
 componentDidMount() {
 
   AsyncStorage.getItem("Username").then((Username) => {
     if (Username!=null){
       this.setState({"Username": JSON.parse(Username).Username });
+    }
+  }).done();
+  AsyncStorage.getItem("@Setting.finger").then((finger) => {
+    if (finger!=null){
+      this.setState({"finger": JSON.parse(finger) });
     }
      
   }).done();
@@ -110,54 +115,78 @@ saveData(value) {
 render() {
     const { navigate } = this.props.navigation;
   //var { navigate } = this.props.navigation;
-  return (
-    <KeyboardAvoidingView behavior="padding" style={styles.fcontainer}>
+  if(this.state.finger==false){
 
-                <View style={styles.loginContainer}>
-                
-                    <Image resizeMode="contain" style={styles.logo} source={require('./images/Logo.png')} />
-                  {/* <Text style={styles}>Sổ tay danh bạ</Text> */}
-                    </View>
-               <View style={styles.formContainer} >
-               <View style={styles.container}>
-          <StatusBar barStyle = 'default'/>
-          <TextInput style = {styles.input} 
-                      autoCapitalize="none" 
-                      underlineColorAndroid='transparent'
-                      onSubmitEditing={() => this.passwordInput.focus()} 
-                      autoCorrect={false} 
-                      //keyboardType='email-address' 
-                      returnKeyType="next" 
-                      placeholder='Username' 
-                      onChangeText ={(Username)=>this.saveData({Username})}
-                      //onChangeText={(Username)=>this.setState({Username})}
-                      value={this.state.Username}
-                      placeholderTextColor='rgba(62,62,62,0.7)'/>
+    return (
+      <KeyboardAvoidingView behavior="padding" style={styles.fcontainer}>
+  
+                  <View style={styles.loginContainer}>
+                  
+                      <Image resizeMode="contain" style={styles.logo} source={require('./images/Logo.png')} />
+                    {/* <Text style={styles}>Sổ tay danh bạ</Text> */}
+                      </View>
+                 <View style={styles.formContainer} >
+                 <View style={styles.container}>
+            <StatusBar barStyle = 'default'/>
+            <TextInput style = {styles.input} 
+                        autoCapitalize="none" 
+                        underlineColorAndroid='transparent'
+                        onSubmitEditing={() => this.passwordInput.focus()} 
+                        autoCorrect={false} 
+                        //keyboardType='email-address' 
+                        returnKeyType="next" 
+                        placeholder='Username' 
+                        onChangeText ={(Username)=>this.saveData({Username})}
+                        //onChangeText={(Username)=>this.setState({Username})}
+                        value={this.state.Username}
+                        placeholderTextColor='rgba(62,62,62,0.7)'/>
+  
+              <View style = { styles.textBoxBtnHolder }>
+                        <TextInput style = {styles.input}   
+                                  returnKeyType="go" ref={(input)=> this.passwordInput = input} 
+                                  underlineColorAndroid='transparent'
+                                  placeholder='Password' 
+                                  onChangeText={(password)=>this.setState({password})}
+                                  value={this.state.password}
+                                  placeholderTextColor='rgba(62,62,82,0.7)' 
+                                  secureTextEntry={this.state.showPassword}/>
+                          <TouchableOpacity activeOpacity = { 0.8 } style = { styles.visibilityBtn } onPress = { this.toggleSwitch }>
+                          <Image source = { ( this.state.showPassword ) ? require('./images/show.png') : require('./images/hide.png') } style = { styles.btnImage } />
+                        </TouchableOpacity>
+              </View>
+             {/*   <Button onPress={onButtonPress} title = 'Login' style={styles.loginButton} /> */}
+          <TouchableOpacity style={styles.buttonContainer}
+          onPress={this._onPressButton.bind(this)}
+          >
+                <Text  style={styles.buttonText}>LOGIN</Text>
+            </TouchableOpacity> 
+  
+        </View>
+                 </View>
+              </KeyboardAvoidingView>
+    );
+  }
+  else
+  {
+    return(
+      <KeyboardAvoidingView behavior="padding" style={styles.fcontainer}>
+          <View style={styles.loginContainer}>  
+              <Image resizeMode="contain" style={styles.logo} source={require('./images/Logo.png')} />
+              </View>
+              <View style={styles.container} >
 
-            <View style = { styles.textBoxBtnHolder }>
-                      <TextInput style = {styles.input}   
-                                returnKeyType="go" ref={(input)=> this.passwordInput = input} 
-                                underlineColorAndroid='transparent'
-                                placeholder='Password' 
-                                onChangeText={(password)=>this.setState({password})}
-                                value={this.state.password}
-                                placeholderTextColor='rgba(62,62,82,0.7)' 
-                                secureTextEntry={this.state.showPassword}/>
-                        <TouchableOpacity activeOpacity = { 0.8 } style = { styles.visibilityBtn } onPress = { this.toggleSwitch }>
-                        <Image source = { ( this.state.showPassword ) ? require('./images/show.png') : require('./images/hide.png') } style = { styles.btnImage } />
-                      </TouchableOpacity>
-            </View>
-           {/*   <Button onPress={onButtonPress} title = 'Login' style={styles.loginButton} /> */}
-        <TouchableOpacity style={styles.buttonContainer}
-        onPress={this._onPressButton.bind(this)}
-        >
-              <Text  style={styles.buttonText}>LOGIN</Text>
+              <TouchableOpacity style={styles.fingerContainer}
+              onPress={this._onPressButton.bind(this)}>
+                <Image resizeMode="contain" style={styles.finger} source={require('./images/finger_print.png')} />
+              
           </TouchableOpacity> 
+           
+          </View>
+      </KeyboardAvoidingView>
+    );
 
-      </View>
-               </View>
-            </KeyboardAvoidingView>
-  );
+  }
+  
 }
 }
 
@@ -207,8 +236,8 @@ logo: {
 },
 fingerContainer:{
   alignItems: 'center',
-    flexGrow: 1,
-    justifyContent: 'center',
+  flexGrow: 1,
+  justifyContent: 'center',
   paddingVertical: 15
 },
 finger: {

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import{View,StyleSheet,TextInput,ListView,Text,ActivityIndicator,Alert,Button,AsyncStorage,FlatList,
-  TouchableOpacity,reject,Image,Keyboard} from "react-native"
+  TouchableOpacity,reject,Image,Keyboard,ScrollView} from "react-native"
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Avatar,List,ListItem } from 'react-native-elements';
 import CONSTANTS from "./Constants"
@@ -92,10 +92,10 @@ export default class ListContacts extends React.Component {
           }
           saveData(value) {
             history = history.reverse();
-            if(history.length>CONSTANTS.MAX_HIS)
-            {
-              history.splice(0,1) ;
-            }
+            // if(history.length>=CONSTANTS.MAX_HIS)
+            // {
+            //   history.splice(0,1) ;
+            // }
             if(history.every((item) => item == value)){
               AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
               console.log('save '+ JSON.stringify(history.concat(value)))
@@ -274,6 +274,7 @@ export default class ListContacts extends React.Component {
                       
                       </View>
                       <Text style={{ fontWeight:'bold',paddingLeft:10, paddingTop:10,paddingBottom:0}}>RECENT SEARCHES</Text>
+                      <ScrollView>
                     <List>
                       {
                         history.map((item, i) => (
@@ -286,6 +287,7 @@ export default class ListContacts extends React.Component {
                         ))
                       }
                       </List>
+                      </ScrollView>
                       </View>
 
 
@@ -319,9 +321,6 @@ export default class ListContacts extends React.Component {
                 //onChangeText={(search)=>this.setState({search})}
                 //onSubmitEditing={(event) =>this.SearchFunction(this.state.search)}
                 // onSubmitEditing={
-                //    this.SearchFunction(this.state.search)}
-                //onChangeText={(search)=>this.setState({search})}
-                //onChangeText={(search) => this.SearchFilterFunction(search)}
                 value={this.state.search}
               />
                </View>
@@ -463,10 +462,6 @@ export default class ListContacts extends React.Component {
           //borderColor:'#FFFFFF',
           height: 52,
           //backgroundColor: '#FFFFFF',
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 0.8 },
-          shadowOpacity: 0.3,
-          shadowRadius: 10,
 
          },
          SectionStyle: {
@@ -483,7 +478,7 @@ export default class ListContacts extends React.Component {
          search: {
           flex:1,
           height: 50,
-          fontSize:12,
+          //fontSize:12,
          },
         container: {
          flex: 1,

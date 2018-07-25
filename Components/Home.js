@@ -91,7 +91,7 @@ export default class Home extends Component<Props> {
             'Confirm','Do you want to logout?',
             [
               {text: 'Cancel', onPress: () => console.log('Cancel Button Pressed'), style: 'cancel'},
-              {text: 'OK', onPress: () => this.props.navigation.navigate("LoginForm")},
+              {text: 'OK', onPress: () => this.props.navigation.navigate("LoginForm",{token: '<new token>'} )},
             ]
           )
       }
