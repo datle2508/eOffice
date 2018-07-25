@@ -60,7 +60,9 @@ export default class Settings extends Component<Props> {
           <ListItem
             
             title="Change password"
+            icon= {'lock'}
             onPress={() => this.props.navigation.navigate('ChangePass')}
+
             
           />
           <ListItem

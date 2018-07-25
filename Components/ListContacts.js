@@ -1,20 +1,15 @@
 import React, {Component} from 'react';
-import{View,StyleSheet,TextInput,ListView,Text,ActivityIndicator,Alert,Button,TouchableOpacity,reject,Image,Keyboard} from "react-native"
+import{View,StyleSheet,TextInput,ListView,Text,ActivityIndicator,Alert,Button,AsyncStorage,FlatList,
+  TouchableOpacity,reject,Image,Keyboard} from "react-native"
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Avatar,List,ListItem } from 'react-native-elements';
 import CONSTANTS from "./Constants"
 import Highlighter from 'react-native-highlight-words';
-const history = [
-  {
-    keyword: 'Lê Đăng Đạt'
-  },
-  {
-    keyword: 'Nguyễn Hương Giang'
-  },
-  {
-    keyword: 'Hoàng Duy Hiển'
-  }
-]
+//history = new Array(5);
+
+var history = [];
+var myArray2 = new Array(5);
+
 export default class ListContacts extends React.Component {
 
         constructor(props){
@@ -44,7 +39,8 @@ export default class ListContacts extends React.Component {
                 {peopleSoft:{
                       'function':'employee',
                       'employeeName': this.state.search,
-                      'pageSize': '10',
+                      "msgID":CONSTANTS.MSG_ID_PS,
+                      'pageSize': CONSTANTS.PAGE_SIZE,
                       'pageNumber': this.state.page+1
                           }
                  }
@@ -86,7 +82,6 @@ export default class ListContacts extends React.Component {
           passHis (his) {
             this.setState({showhis: false,search:his});
             this.SearchFunction(his);
-            //this.setState({search: his,showhis: false});
             
           }
           onfocus () {
@@ -95,6 +90,44 @@ export default class ListContacts extends React.Component {
           onblur () {
             this.setState({showhis: false})
           }
+          saveData(value) {
+            history = history.reverse();
+            if(history.length>CONSTANTS.MAX_HIS)
+            {
+              history.splice(0,1) ;
+            }
+            if(history.every((item) => item == value)){
+              AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
+              console.log('save '+ JSON.stringify(history.concat(value)))
+            }else
+            {
+              //delete old value
+              history.splice(history.indexOf(value),1);
+              AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
+              console.log('save '+ JSON.stringify(history.concat(value)));
+
+            }
+            console.log('save exisst ')
+            
+
+              
+          }
+          getData(){
+            history =[]
+            AsyncStorage.getItem("historylist").then((myArray2) => {
+              if (myArray2!=null){
+
+                history = JSON.parse(myArray2).reverse();
+                console.log('get '+ JSON.parse(myArray2));
+                //history.push(JSON.parse(myArray2)) ;
+                //this.setState({"historylist": JSON.parse(myArray2) });
+              }
+              
+               
+            }).done();
+            
+          }
+          
           renderSectionHeader(sectionData, sectionID) {
             return (
               <View style={styles.section}>
@@ -109,6 +142,8 @@ export default class ListContacts extends React.Component {
            }
            SearchFunction(text){
             Keyboard.dismiss();
+            this.saveData(text);
+            this.getData();
             fetch(CONSTANTS.PS_URL
             ,{
               method: 'POST',
@@ -120,7 +155,8 @@ export default class ListContacts extends React.Component {
                 {peopleSoft:{
                       'function':'employee',
                       'employeeName': text,
-                      'pageSize': '10',
+                      "msgID":CONSTANTS.MSG_ID_PS,
+                      'pageSize': CONSTANTS.PAGE_SIZE,
                       'pageNumber':'1'
                           }
                  }
@@ -163,7 +199,8 @@ export default class ListContacts extends React.Component {
               });
         }
         componentDidMount() {
-            return fetch(CONSTANTS.PS_URL
+          this.getData();
+             fetch(CONSTANTS.PS_URL
             ,{
               method: 'POST',
               headers: {
@@ -174,8 +211,8 @@ export default class ListContacts extends React.Component {
                 {peopleSoft:{
                       'function':'employee',
                       'employeeName': this.state.search,
-                      "msgID":"1231312",
-                      'pageSize': '10',
+                      "msgID":CONSTANTS.MSG_ID_PS,
+                      'pageSize': CONSTANTS.PAGE_SIZE,
                       'pageNumber': this.state.page
                           }
                  }
@@ -220,7 +257,7 @@ export default class ListContacts extends React.Component {
                       <View style={list.SectionStyle}>
                       <View style={{margin:5}}>
                       <Icon name= 'search' size={15} color="#AAAAAA" />
-                      </View>
+                      </View >
                       <TextInput style={list.search}
                         placeholder="Search"
                         returnKeyType="search" 
@@ -228,30 +265,27 @@ export default class ListContacts extends React.Component {
                         clearButtonMode="while-editing"
                         onFocus={(search)=>this.onfocus()}
                         onBlur={(search)=>this.onblur()}
+                        //onChangeText ={(search)=>this.saveData({search})}
                           onChangeText={(search)=>this.setState({search})}
                           onSubmitEditing={(event) =>this.SearchFunction(this.state.search)}
                         value={this.state.search}
                       />
                        </View>
+                      
                       </View>
-                    <View >
+                      <Text style={{ fontWeight:'bold',paddingLeft:10, paddingTop:10,paddingBottom:0}}>RECENT SEARCHES</Text>
                     <List>
                       {
                         history.map((item, i) => (
                           <ListItem
                             key={i}
-                            title={item.keyword}
+                            title={item}
                             underlayColor = '#64b5f6'
-                            onPress={() => this.passHis(item.keyword)}
-                            //onPress={this.passHis(item.keyword)}
-                            
-                            //{() => {this.passHis(item.keyword).bind(this)}}
-                            
+                            onPress={() => this.passHis(item)}
                           />
                         ))
                       }
                       </List>
-                  </View>
                       </View>
 
 
@@ -276,10 +310,11 @@ export default class ListContacts extends React.Component {
                 clearButtonMode="while-editing"
                 onFocus={(search)=>this.onfocus()}
                 onBlur={(search)=>this.onblur()}
-                on
+                
                 // onChangeText={(search) =>
                 //   this.setState({ search }, () => this.SearchFunction(this.state.search))}
                   onChangeText={(search)=>this.setState({search})}
+                  //onChangeText ={(search)=>this.saveData({search})}
                   onSubmitEditing={(event) =>this.SearchFunction(this.state.search)}
                 //onChangeText={(search)=>this.setState({search})}
                 //onSubmitEditing={(event) =>this.SearchFunction(this.state.search)}
@@ -291,7 +326,7 @@ export default class ListContacts extends React.Component {
               />
                </View>
               </View>
-            <View >
+            
       
         <ListView TouchableHighlight style={list.container}
           dataSource={this.state.dataSource}
@@ -351,7 +386,7 @@ export default class ListContacts extends React.Component {
             }
           }}
         />
-          </View>
+          
               </View>
           );
         }
@@ -424,10 +459,14 @@ export default class ListContacts extends React.Component {
          },
          searchcontainer: {
           //backgroundColor: '#F5FCFF',
-          borderWidth:1,
-          borderColor:'#FFFFFF',
+          //borderWidth:1,
+          //borderColor:'#FFFFFF',
           height: 52,
-          backgroundColor: '#FFFFFF',
+          //backgroundColor: '#FFFFFF',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 0.8 },
+          shadowOpacity: 0.3,
+          shadowRadius: 10,
 
          },
          SectionStyle: {
@@ -437,9 +476,9 @@ export default class ListContacts extends React.Component {
           backgroundColor: 'rgba(247,247,247,1.0)',
           borderWidth:1,borderRadius: 10,
           borderColor:'#AAAAAA',
-          height: 40,
-          borderWidth:1,borderRadius: 10,
-          margin: 5
+
+          
+
       },
          search: {
           flex:1,
@@ -458,6 +497,7 @@ export default class ListContacts extends React.Component {
           fontSize: 14,
           fontWeight: 'bold',
           backgroundColor: 'rgba(247,247,247,1.0)',
+          
         },
         item: {
           padding: 10,

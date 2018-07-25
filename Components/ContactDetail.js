@@ -58,7 +58,7 @@ export default class ContactDetail extends Component {
       
       <Avatar
         large
-        
+        rounded
         title = {avatar}
         onPress={() => console.log("Works!")}
         activeOpacity={0.7}
