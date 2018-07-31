@@ -88,26 +88,50 @@ export default class ListContacts extends React.Component {
             this.setState({showhis: true})
           }
           onblur () {
-            this.setState({showhis: false})
+            
+            this.setState({showhis: false});
           }
           saveData(value) {
             history = history.reverse();
-            // if(history.length>=CONSTANTS.MAX_HIS)
+            if(history.length>CONSTANTS.MAX_HIS)
+            {
+              history.splice(0,1) ;
+            }
+            //var pos =  history.every((item) => item.id !== ticketId);
+            if(history.every((item) => item !== value))
+            {
+              
+              AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
+              console.log('save1 '+ JSON.stringify(history.concat(value)))
+            }
+            else
+            {
+              history.splice(history.indexOf(value),1);
+              AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
+              console.log('save2 '+ JSON.stringify(history.concat(value)));
+            }
+
+
+            //AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
+            //console.log('save '+ JSON.stringify(history.concat(value)));
+              
+            //AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
+            // if(history.length>CONSTANTS.MAX_HIS)
             // {
             //   history.splice(0,1) ;
             // }
-            if(history.every((item) => item == value)){
-              AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
-              console.log('save '+ JSON.stringify(history.concat(value)))
-            }else
-            {
-              //delete old value
-              history.splice(history.indexOf(value),1);
-              AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
-              console.log('save '+ JSON.stringify(history.concat(value)));
+            // if(history.every((item) => item == value)){
+            //   AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
+            //   console.log('save '+ JSON.stringify(history.concat(value)))
+            // }else
+            // {
+            //   //delete old value
+            //   history.splice(history.indexOf(value),1);
+            //   AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
+            //   console.log('save '+ JSON.stringify(history.concat(value)));
 
-            }
-            console.log('save exisst ')
+            // }
+            //console.log('save exisst ')
             
 
               
@@ -135,13 +159,14 @@ export default class ListContacts extends React.Component {
               </View>
               )
           }
-          GetListViewItem (department,name,position,avatar,workphone,phonenumber,email) {
+          GetListViewItem (department, firstName,lastName,name,position,avatar,workphone,phonenumber,email) {
              this.props.navigation.navigate("ContactDetail",
-             { department:department,name: name,position:position,avatar:avatar,email:email,workphone:workphone,phonenumber:phonenumber });
+             { department:department,firstName:firstName,lastName:lastName,name: name,position:position,avatar:avatar,email:email,workphone:workphone,phonenumber:phonenumber });
            
            }
            SearchFunction(text){
             Keyboard.dismiss();
+            this.onblur();
             this.saveData(text);
             this.getData();
             fetch(CONSTANTS.PS_URL
@@ -256,7 +281,7 @@ export default class ListContacts extends React.Component {
                       <View style={list.searchcontainer}>
                       <View style={list.SectionStyle}>
                       <View style={{margin:5}}>
-                      <Icon name= 'search' size={15} color="#AAAAAA" />
+                      <Icon name= 'search'margin = {5}  size={20} color="#AAAAAA" />
                       </View >
                       <TextInput style={list.search}
                         placeholder="Search"
@@ -264,7 +289,7 @@ export default class ListContacts extends React.Component {
                         underlineColorAndroid='transparent'
                         clearButtonMode="while-editing"
                         onFocus={(search)=>this.onfocus()}
-                        onBlur={(search)=>this.onblur()}
+                        //onBlur={(search)=>this.onblur()}
                         //onChangeText ={(search)=>this.saveData({search})}
                           onChangeText={(search)=>this.setState({search})}
                           onSubmitEditing={(event) =>this.SearchFunction(this.state.search)}
@@ -281,8 +306,9 @@ export default class ListContacts extends React.Component {
                           <ListItem
                             key={i}
                             title={item}
-                            underlayColor = '#64b5f6'
+                            underlayColor = '#FFFFFF'
                             onPress={() => this.passHis(item)}
+                            //onPress={() => this.goto(item.appScreen)}
                           />
                         ))
                       }
@@ -303,7 +329,7 @@ export default class ListContacts extends React.Component {
               <View style={list.searchcontainer}>
               <View style={list.SectionStyle}>
               <View style={{margin:5}}>
-              <Icon name= 'search' size={15} color="#AAAAAA" />
+              <Icon name= 'search'margin = {5} size={20} color="#AAAAAA" />
               </View>
               <TextInput style={list.search}
                 placeholder="Search"
@@ -334,7 +360,7 @@ export default class ListContacts extends React.Component {
  
             <View style={{flex:1, flexDirection: 'row', padding: 5}} >
               <TouchableOpacity style={{flex:1, flexDirection: 'row'}}
-               onPress={this.GetListViewItem.bind(this,rowData.deptName3+' '+rowData.deptName4,rowData.nameDisplay,rowData.officerDescr,rowData.label,rowData.phoneOffice,rowData.phonePersonal,rowData.emailAddr)}>
+               onPress={this.GetListViewItem.bind(this,rowData.deptName3+' '+rowData.deptName4,rowData.firstName,rowData.lastName,rowData.nameDisplay,rowData.officerDescr,rowData.label,rowData.phoneOffice,rowData.phonePersonal,rowData.emailAddr)}>
                     <Avatar
                     containerStyle={{ marginTop: 10,marginBottom: 10}}
                 medium
@@ -459,25 +485,28 @@ export default class ListContacts extends React.Component {
          searchcontainer: {
           //backgroundColor: '#F5FCFF',
           //borderWidth:1,
-          //borderColor:'#FFFFFF',
-          height: 52,
-          //backgroundColor: '#FFFFFF',
+         // borderColor:'#FFFFFF',
+          height: 42,
+          backgroundColor: '#FFFFFF',
 
          },
          SectionStyle: {
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'rgba(247,247,247,1.0)',
-          borderWidth:1,borderRadius: 10,
+          backgroundColor: 'rgba(247,247,247,4.0)',
+          borderWidth:1,borderRadius: 20,
           borderColor:'#AAAAAA',
+          margin:5,
+
 
           
 
       },
          search: {
           flex:1,
-          height: 50,
+          height: 30,
+          padding:0
           //fontSize:12,
          },
         container: {

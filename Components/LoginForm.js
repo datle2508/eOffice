@@ -3,6 +3,7 @@ import { Button, View, Text,
   StyleSheet,ListView,SectionList,StatusBar,TouchableOpacity,Image,AsyncStorage,reject,
   TextInput,Alert ,KeyboardAvoidingView} from 'react-native';
 import { createStackNavigator } from 'react-navigation'; // Version can be specified in package.json
+import TouchID from 'react-native-touch-id';
 import ListContacts from "./ListContacts";
 import ContactDetail from "./ContactDetail";
 import ChangePass from "./ChangePass";
@@ -33,6 +34,21 @@ const optionalConfigObject = {
   toggleSwitch() {
     this.setState({ showPassword: !this.state.showPassword });
   }
+  _pressHandler() {
+    TouchID.authenticate('Put the finger on scanner to login',CONSTANTS.BIO_CONFIG)
+      .then(success => {
+        this._onPressButton();
+        //Alert.alert('Authenticated Successfully');
+        //this.props.navigation.navigate('Home');
+      })
+      .catch(error => {
+        Alert.alert('Authentication Failed');
+      });
+
+    }
+    toggleSwitch() {
+      this.setState({ showPassword: !this.state.showPassword });
+    }
 
   _onPressButton() {
     const { Username, password } = this.state;
@@ -101,9 +117,14 @@ componentDidMount() {
   AsyncStorage.getItem("@Setting.finger").then((finger) => {
     if (finger!=null){
       this.setState({"finger": JSON.parse(finger) });
+      if(JSON.parse(finger)== true){
+        this._pressHandler();
+      }
     }
      
   }).done();
+
+
 }
 saveData(value) {
   
@@ -175,8 +196,12 @@ render() {
               </View>
               <View style={styles.container} >
 
+              <View style={styles.fingerContainer}> 
+              <Text> Wellcome back </Text>
+                </View>
+
               <TouchableOpacity style={styles.fingerContainer}
-              onPress={this._onPressButton.bind(this)}>
+              onPress={this._pressHandler.bind(this)}>
                 <Image resizeMode="contain" style={styles.finger} source={require('./images/finger_print.png')} />
               
           </TouchableOpacity> 

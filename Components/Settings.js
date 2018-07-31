@@ -8,14 +8,16 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,ScrollView,Alert,AsyncStorage} from 'react-native';
 import {icon} from 'react-native-vector-icons' ;
-import { List,ListItem} from 'react-native-elements'
+import { List,ListItem} from 'react-native-elements';
+import TouchID from 'react-native-touch-id';
 import ChangePass from './ChangePass';
+import CONSTANTS from "./Constants";
+
 
 const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
+  ios: 'Login with touchid/faceid',
   android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
+      'Login with fingerprint',
 });
 
 
@@ -53,12 +55,43 @@ export default class Settings extends Component<Props> {
           Alert.alert("Comming soon!!")
       }
     }
+    _pressHandler() {
+      TouchID.authenticate('Put the finger on scanner to login',CONSTANTS.BIO_CONFIG)
+        .then(success => {
+          this._onPressButton();
+          //Alert.alert('Authenticated Successfully');
+          //this.props.navigation.navigate('Home');
+        })
+        .catch(error => {
+          Alert.alert('Authentication Failed');
+        });
+  
+      }
 
     saveData(value) {
-  
-      AsyncStorage.setItem("@Setting.finger" ,JSON.stringify(value));
-    
-      this.setState({"finger": value});
+      TouchID.isSupported()
+  .then(biometryType => {
+    // Success code
+    if (biometryType === 'FaceID') {
+        console.log('FaceID is supported.');
+    } else {
+      TouchID.authenticate('Put the finger on scanner to login',CONSTANTS.BIO_CONFIG)
+      .then(success => {
+        AsyncStorage.setItem("@Setting.finger" ,JSON.stringify(value));
+        this.setState({"finger": value});
+      })
+      .catch(error => {
+        Alert.alert('Authentication Failed');
+      });
+        console.log('TouchID is supported.');
+    }
+  })
+  .catch(error => {
+    Alert.alert('Biometric login not supported!');
+    // Failure code
+    console.log(error);
+  });
+
     }
     componentDidMount() {
 
@@ -88,7 +121,7 @@ export default class Settings extends Component<Props> {
             leftIcon={{  name: 'fingerprint',color:"pink", }}
             switched={this.state.finger}
             hideChevron
-            title="Login with fingerprint"
+            title={instructions}
             onSwitch={(value) => this.saveData(value)}
           />
 

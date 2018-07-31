@@ -7,6 +7,11 @@ const CONSTANTS = {
     CHECKPERMISION_URL:'OpenSans-SemiBold',
     PAGE_SIZE:10,
     MSG_ID_PS:1231312,
-    MAX_HIS:5
+    MAX_HIS:5,
+    BIO_CONFIG : {
+      title: "Authentication Required", // Android
+      color: "#e00606", // Android,
+      fallbackLabel: "Show Passcode" // iOS (if empty, then label is hidden)
+    },
   };
   export default CONSTANTS;
