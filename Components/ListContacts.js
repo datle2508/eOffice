@@ -136,20 +136,19 @@ export default class ListContacts extends React.Component {
 
               
           }
-          getData(){
+         async getData(){
             history =[]
-            AsyncStorage.getItem("historylist").then((myArray2) => {
-              if (myArray2!=null){
-
-                history = JSON.parse(myArray2).reverse();
-                console.log('get '+ JSON.parse(myArray2));
-                //history.push(JSON.parse(myArray2)) ;
-                //this.setState({"historylist": JSON.parse(myArray2) });
-              }
-              
-               
-            }).done();
-            
+            try {
+              await AsyncStorage.getItem("historylist").then((myArray2) => {
+                if (myArray2!=null){
+  
+                  history = JSON.parse(myArray2).reverse();
+                  console.log('get '+ JSON.parse(myArray2));
+                }
+              }).done();
+            } catch (error) {
+              // Error saving data
+            }
           }
           
           renderSectionHeader(sectionData, sectionID) {

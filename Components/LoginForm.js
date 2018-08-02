@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Button, View, Text,
+import { Button, View, Text,ActivityIndicator,
   StyleSheet,ListView,SectionList,StatusBar,TouchableOpacity,Image,AsyncStorage,reject,
   TextInput,Alert ,KeyboardAvoidingView} from 'react-native';
 import { createStackNavigator } from 'react-navigation'; // Version can be specified in package.json
@@ -12,6 +12,7 @@ import Home from "./Home";
 import CONSTANTS from "./Constants"
 import { YellowBox,CheckBox } from 'react-native'
 
+var IMG=require('./images/finger_print.png');
 
 
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated'])
@@ -27,7 +28,7 @@ const optionalConfigObject = {
     super(props);
     isLoggedIn: false
     this.toggleSwitch = this.toggleSwitch.bind(this);
-    this.state={Username:'',password:'',showPassword: true,finger:false}
+    this.state={Username:'',password:'',showPassword: true,finger:false,bioType:'',imgURL:''}
     this.arrayholder = [] ;
     
 }
@@ -50,57 +51,9 @@ const optionalConfigObject = {
       this.setState({ showPassword: !this.state.showPassword });
     }
 
-  _onPressButton() {
-    const { Username, password } = this.state;
-    //this.props.navigation.navigate('Home'
-    fetch(CONSTANTS.LOGIN_URL,{
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-       },
-       body: JSON.stringify(
-        {UserInfo:{
-              'type':'AD',
-              //  'userName': Username,
-              //  'passWord': password
-              'userName': 'hunglv5',
-              'passWord': 'abcd1234@#'
-                  }
-         }
-       ) 
-    })
-      .then((response) => response.json())
-      .then((responseJson) => {
-        console.log(responseJson)
-          this.arrayholder = responseJson 
-  
-          if(responseJson.UserInfo.authen == true){
-              var fullName = responseJson.UserInfo.fullName
-              var email =responseJson.UserInfo.email
-              var mobile = responseJson.UserInfo.mobile
-              var department =responseJson.UserInfo.department
-              //Alert.alert(fullName)
+_onPressButton() {
 
-              this.props.navigation.navigate('Home',{
-                 fullname: fullName,
-                 email:email,
-                 mobile:mobile,
-                 department:department                
-                })
-  
-          }else{
-              Alert.alert('User not exist!!')
-          }
-          
-      })
-      .catch((error) => {
-        Alert.alert(error.message);
-        reject(new Error(`Unable to retrieve events.\n${error.message}`))
-        console.error(error);
-        
-      });
-    
+this.Login();
 }
 componentWillReceiveProps(nextProps) {
   if (nextProps.navigation.state.params.token) {
@@ -108,29 +61,118 @@ componentWillReceiveProps(nextProps) {
   }
 }
 componentDidMount() {
-
-  AsyncStorage.getItem("Username").then((Username) => {
-    if (Username!=null){
-      this.setState({"Username": JSON.parse(Username).Username });
-    }
-  }).done();
-  AsyncStorage.getItem("@Setting.finger").then((finger) => {
-    if (finger!=null){
-      this.setState({"finger": JSON.parse(finger) });
-      if(JSON.parse(finger)== true){
-        this._pressHandler();
-      }
-    }
-     
-  }).done();
-
-
+  this.GetData();
 }
-saveData(value) {
-  
-  AsyncStorage.setItem("Username" ,JSON.stringify(value));
+AltLogin() {
+  this.setState.finger = false;
+  AsyncStorage.setItem("@Setting.finger" ,JSON.stringify(false));
+  this.componentDidMount();
+}
+Login(){
+  const { Username, password } = this.state;
+  //this.props.navigation.navigate('Home'
+  fetch(CONSTANTS.LOGIN_URL,{
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+     },
+     body: JSON.stringify(
+      {UserInfo:{
+            'type':'AD',
+            //  'userName': Username,
+            //  'passWord': password
+            'userName': 'hunglv5',
+            'passWord': 'abcd1234@#'
+                }
+       }
+     ) 
+  })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      console.log(responseJson)
+        this.arrayholder = responseJson 
 
-  this.setState({"Username": value});
+        if(responseJson.UserInfo.authen == true){
+            var fullName = responseJson.UserInfo.fullName
+            var email =responseJson.UserInfo.email
+            var mobile = responseJson.UserInfo.mobile
+            var department =responseJson.UserInfo.department
+            //Alert.alert(fullName)
+
+            this.props.navigation.navigate('Home',{
+               fullname: fullName,
+               email:email,
+               mobile:mobile,
+               department:department                
+              })
+
+        }else{
+            Alert.alert('User not exist!!')
+        }
+        
+    })
+    .catch((error) => {
+      Alert.alert(error.message);
+      reject(new Error(`Unable to retrieve events.\n${error.message}`))
+      console.error(error);
+      
+    });
+}
+async GetData(){
+  try {
+    await AsyncStorage.getItem("Username").then((Username) => {
+      if (Username!=null){
+        this.setState({"Username": JSON.parse(Username).Username });
+      }
+    }).done();
+    // AsyncStorage.getItem("password").then((password) => {
+    //   if (password!=null){
+    //     this.setState({"password": JSON.parse(password).password });
+    //   }
+    // }).done();
+    AsyncStorage.getItem("@Setting.bioType").then((bioType) => {
+      if (bioType==='FaceID'){
+        IMG = require('./images/FaceID.png')
+      }
+      else
+      {
+        IMG = require('./images/finger_print.png')
+        //this.setState({imgURL:'./images/finger_print.png'});
+      }
+    }).done();
+    AsyncStorage.getItem("@Setting.finger").then((finger) => {
+      if (finger!=null){
+        this.setState({"finger": JSON.parse(finger) });
+        if(JSON.parse(finger)== true){
+          this._pressHandler();
+        }
+      }
+       
+    }).done();
+
+
+  } catch (error) {
+    // Error saving data
+  }
+
+  
+}
+async saveUserName(value) {
+  try {
+    await   AsyncStorage.setItem("Username" ,JSON.stringify(value));
+    this.setState({"Username": value});
+  } catch (error) {
+    // Error saving data
+  }
+}
+async savePassword(value) {
+  try {
+    await   AsyncStorage.setItem("password" ,JSON.stringify(value));
+    this.setState({"password": value});
+  } catch (error) {
+    // Error saving data
+  }
 }
 
 render() {
@@ -152,13 +194,10 @@ render() {
             <TextInput style = {styles.input} 
                         autoCapitalize="none" 
                         underlineColorAndroid='transparent'
-                        onSubmitEditing={() => this.passwordInput.focus()} 
                         autoCorrect={false} 
-                        //keyboardType='email-address' 
                         returnKeyType="next" 
                         placeholder='Username' 
-                        onChangeText ={(Username)=>this.saveData({Username})}
-                        //onChangeText={(Username)=>this.setState({Username})}
+                        onChangeText ={(Username)=>this.saveUserName({Username})}
                         value={this.state.Username}
                         placeholderTextColor='rgba(62,62,62,0.7)'/>
   
@@ -167,7 +206,7 @@ render() {
                                   returnKeyType="go" ref={(input)=> this.passwordInput = input} 
                                   underlineColorAndroid='transparent'
                                   placeholder='Password' 
-                                  onChangeText={(password)=>this.setState({password})}
+                                  onChangeText={(password)=>this.savePassword({password})}
                                   value={this.state.password}
                                   placeholderTextColor='rgba(62,62,82,0.7)' 
                                   secureTextEntry={this.state.showPassword}/>
@@ -198,11 +237,14 @@ render() {
 
               <View style={styles.fingerContainer}> 
               <Text> Wellcome back </Text>
+              <TouchableOpacity onPress={this.AltLogin.bind(this)}>
+              <Text style ={styles.detail} > Login with another user? </Text>
+              </TouchableOpacity>
                 </View>
 
               <TouchableOpacity style={styles.fingerContainer}
               onPress={this._pressHandler.bind(this)}>
-                <Image resizeMode="contain" style={styles.finger} source={require('./images/finger_print.png')} />
+                <Image resizeMode="contain" style={styles.finger} source={IMG} />
               
           </TouchableOpacity> 
            
@@ -301,7 +343,10 @@ textBoxBtnHolder:
     resizeMode: 'contain',
     height: '100%',
     width: '100%'
-  }
+  },
+  detail: {
+    color:'#4F8EF7',
+   },
  
 });
 const RootStack =  createStackNavigator(

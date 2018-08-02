@@ -274,10 +274,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingBottom: 5,
     paddingLeft: 15,
-    //justifyContent: 'center',
-    //alignItems:'center',
     color:'#4F8EF7',
-    
    },
   label:{
       fontSize:15

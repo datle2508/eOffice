@@ -67,29 +67,36 @@ export default class Settings extends Component<Props> {
         });
   
       }
+      checkBioSupported(){
 
-    saveData(value) {
-      TouchID.isSupported()
-  .then(biometryType => {
-    // Success code
-    if (biometryType === 'FaceID') {
-        console.log('FaceID is supported.');
-    } else {
-      TouchID.authenticate('Put the finger on scanner to login',CONSTANTS.BIO_CONFIG)
-      .then(success => {
-        AsyncStorage.setItem("@Setting.finger" ,JSON.stringify(value));
-        this.setState({"finger": value});
-      })
-      .catch(error => {
-        Alert.alert('Authentication Failed');
-      });
-        console.log('TouchID is supported.');
-    }
-  })
-  .catch(error => {
-    Alert.alert('Biometric login not supported!');
-    // Failure code
-    console.log(error);
+      }
+
+     async saveData(value) {
+      this.setState({"finger": value});
+              TouchID.isSupported()
+            .then(biometryType => {
+            // Success code
+            if (biometryType === 'FaceID') {
+                console.log('FaceID is supported.');
+                
+            } else {
+              TouchID.authenticate('Put the finger on scanner to login',CONSTANTS.BIO_CONFIG)
+              .then(success => {
+                AsyncStorage.setItem("@Setting.finger" ,JSON.stringify(value));
+              })
+              .catch(error => {
+                this.setState({"finger": !value});
+                Alert.alert('Authentication Failed');
+              });
+                console.log('TouchID is supported.');
+            }
+            AsyncStorage.setItem("@Setting.bioType" ,JSON.stringify(biometryType));
+          })
+          .catch(error => {
+            this.setState({"finger": !value});
+            Alert.alert('Biometric login not supported!');
+            // Failure code
+            console.log(error);
   });
 
     }
@@ -113,8 +120,6 @@ export default class Settings extends Component<Props> {
             title="Change password"
             leftIcon={{name: 'refresh',color:"#4F8EF7"}}
             onPress={() => this.props.navigation.navigate('ChangePass')}
-
-            
           />
           <ListItem
             switchButton
