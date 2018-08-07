@@ -23,7 +23,7 @@ const optionalConfigObject = {
   fallbackLabel: "Show Passcode" // iOS (if empty, then label is hidden)
 }
 
- class LoginForm extends React.Component {
+export default class LoginForm extends React.Component {
   constructor(props){
     super(props);
     isLoggedIn: false
@@ -349,69 +349,10 @@ textBoxBtnHolder:
    },
  
 });
-const RootStack =  createStackNavigator(
-  {
-    LoginForm: {
-      screen: LoginForm,
-      navigationOptions: () => ({
-        header:null
-      }),
+
+// export default class App extends React.Component {
+//   render() {
     
-    },
-    Home: {
-      screen: Home,
-      navigationOptions: () => ({
-        header:null,
-        gesturesEnabled: false,
-      }),
-    },
-
-    Settings: {
-      screen: Settings,
-      navigationOptions: () => ({
-        title: 'Settings',
-        headerBackTitle: 'Settings'
-      }),
-    },
-    ChangePass: {
-      screen: ChangePass,
-      navigationOptions: () => ({
-        title: 'Change Password',
-        headerBackTitle: 'Change Password'
-      }),
-    },
-    ListContacts: {
-      screen: ListContacts,
-      navigationOptions: () => ({
-        title: 'Contacts',
-        headerBackTitle: ''
-      }),
-      
-    },
-
-    ContactDetail: {
-      screen: ContactDetail,
-      navigationOptions: () => ({
-
-      }),
-    },
-  },
-  {
-    initialRouteName: 'LoginForm',
-    tabBarPosition: 'bottom',
-    animationEnabled: true,
-    tabBarOptions: {
-      activeTintColor: 'blue',
-      inactiveTintColor: '#fff',
-      showIcon: true,
-      showLabel: true,
-    }
-  }
-);
-
-export default class App extends React.Component {
-  render() {
-    
-    return <RootStack />;
-  }
-}
+//     return <RootStack />;
+//   }
+// }

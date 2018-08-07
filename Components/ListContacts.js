@@ -1,29 +1,35 @@
 import React, {Component} from 'react';
-import{View,StyleSheet,TextInput,ListView,Text,ActivityIndicator,Alert,Button,AsyncStorage,FlatList,
+import{View,StyleSheet,TextInput,ListView,Text,ActivityIndicator,Alert,Button,AsyncStorage,FlatList,BackHandler,
   TouchableOpacity,reject,Image,Keyboard,ScrollView} from "react-native"
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Avatar,List,ListItem } from 'react-native-elements';
 import CONSTANTS from "./Constants"
 import Highlighter from 'react-native-highlight-words';
-//history = new Array(5);
-
-var history = [];
-var myArray2 = new Array(5);
 
 export default class ListContacts extends React.Component {
 
         constructor(props){
           super(props);
+          this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
           this.state={isLoading: true,search:'',isLoadingMore: false,page:1,showhis: false,
           dataSource :new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
           finalpage:false
           
         }
           this.arrayholder = [] ;
+          var history = [];
+          var myArray2 = new Array(5);
         }
         
-      componentWillMount(){
-
+        componentWillMount(){
+          BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        }
+        componentWillUnmount() {
+          BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+      }
+      handleBackButtonClick() {
+        this.props.navigation.goBack(null);
+        return true;
       }
         _fetchMore() {
           if (!this.state.isLoadingMore&&!this.state.finalpage) {
@@ -91,50 +97,24 @@ export default class ListContacts extends React.Component {
             
             this.setState({showhis: false});
           }
-          saveData(value) {
-            history = history.reverse();
+          async saveData(value) {
+           history = history.reverse();
             if(history.length>CONSTANTS.MAX_HIS)
             {
               history.splice(0,1) ;
             }
-            //var pos =  history.every((item) => item.id !== ticketId);
             if(history.every((item) => item !== value))
             {
               
-              AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
+              await AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
               console.log('save1 '+ JSON.stringify(history.concat(value)))
             }
             else
             {
               history.splice(history.indexOf(value),1);
-              AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
+              await AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
               console.log('save2 '+ JSON.stringify(history.concat(value)));
             }
-
-
-            //AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
-            //console.log('save '+ JSON.stringify(history.concat(value)));
-              
-            //AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
-            // if(history.length>CONSTANTS.MAX_HIS)
-            // {
-            //   history.splice(0,1) ;
-            // }
-            // if(history.every((item) => item == value)){
-            //   AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
-            //   console.log('save '+ JSON.stringify(history.concat(value)))
-            // }else
-            // {
-            //   //delete old value
-            //   history.splice(history.indexOf(value),1);
-            //   AsyncStorage.setItem('historylist',JSON.stringify(history.concat(value)));
-            //   console.log('save '+ JSON.stringify(history.concat(value)));
-
-            // }
-            //console.log('save exisst ')
-            
-
-              
           }
          async getData(){
             history =[]
@@ -314,8 +294,6 @@ export default class ListContacts extends React.Component {
                       </List>
                       </ScrollView>
                       </View>
-
-
                   );
               }
               
@@ -323,8 +301,6 @@ export default class ListContacts extends React.Component {
           return (
 
           <View style={list.header}>
-            {/* <Text style={list.Appname}>Contacts</Text> */}
-            {/* <Icon name="ios-search" size={20} color="#000"/> */}
               <View style={list.searchcontainer}>
               <View style={list.SectionStyle}>
               <View style={{margin:5}}>
@@ -337,15 +313,8 @@ export default class ListContacts extends React.Component {
                 clearButtonMode="while-editing"
                 onFocus={(search)=>this.onfocus()}
                 onBlur={(search)=>this.onblur()}
-                
-                // onChangeText={(search) =>
-                //   this.setState({ search }, () => this.SearchFunction(this.state.search))}
                   onChangeText={(search)=>this.setState({search})}
-                  //onChangeText ={(search)=>this.saveData({search})}
                   onSubmitEditing={(event) =>this.SearchFunction(this.state.search)}
-                //onChangeText={(search)=>this.setState({search})}
-                //onSubmitEditing={(event) =>this.SearchFunction(this.state.search)}
-                // onSubmitEditing={
                 value={this.state.search}
               />
                </View>
@@ -482,10 +451,7 @@ export default class ListContacts extends React.Component {
           //backgroundColor: 'red',
          },
          searchcontainer: {
-          //backgroundColor: '#F5FCFF',
-          //borderWidth:1,
-         // borderColor:'#FFFFFF',
-          height: 42,
+          height: 46,
           backgroundColor: '#FFFFFF',
 
          },
@@ -493,14 +459,11 @@ export default class ListContacts extends React.Component {
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'rgba(247,247,247,4.0)',
-          borderWidth:1,borderRadius: 20,
-          borderColor:'#AAAAAA',
-          margin:5,
 
-
-          
-
+          backgroundColor:'rgba(204,204,204,0.5)',
+          borderWidth:1,borderRadius: 10,
+          borderColor:'rgba(204,204,204,0.5)',
+          margin:12,
       },
          search: {
           flex:1,

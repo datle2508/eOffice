@@ -6,7 +6,7 @@
  * @flow
  */
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View,ScrollView,Alert,AsyncStorage} from 'react-native';
+import {Platform, StyleSheet, Text, View,ScrollView,Alert,AsyncStorage,BackHandler} from 'react-native';
 import {icon} from 'react-native-vector-icons' ;
 import { List,ListItem} from 'react-native-elements';
 import TouchID from 'react-native-touch-id';
@@ -19,9 +19,6 @@ const instructions = Platform.select({
   android:
       'Login with fingerprint',
 });
-
-
-
 type Props = {};
 const list = [
     {
@@ -41,6 +38,7 @@ const list = [
 export default class Settings extends Component<Props> {
     constructor(props){
         super(props);
+        this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
         this.arrayholder = [] ;
         this.state={ Username:'',password:'',finger: false};
     }
@@ -59,8 +57,6 @@ export default class Settings extends Component<Props> {
       TouchID.authenticate('Put the finger on scanner to login',CONSTANTS.BIO_CONFIG)
         .then(success => {
           this._onPressButton();
-          //Alert.alert('Authenticated Successfully');
-          //this.props.navigation.navigate('Home');
         })
         .catch(error => {
           Alert.alert('Authentication Failed');
@@ -68,12 +64,12 @@ export default class Settings extends Component<Props> {
   
       }
       checkBioSupported(){
-
       }
 
      async saveData(value) {
       this.setState({"finger": value});
-              TouchID.isSupported()
+      await              
+          TouchID.isSupported()
             .then(biometryType => {
             // Success code
             if (biometryType === 'FaceID') {
@@ -97,18 +93,25 @@ export default class Settings extends Component<Props> {
             Alert.alert('Biometric login not supported!');
             // Failure code
             console.log(error);
-  });
-
+          });
     }
     componentDidMount() {
-
       AsyncStorage.getItem("@Setting.finger").then((finger) => {
         if (finger!=null){
           this.setState({"finger": JSON.parse(finger) });
         }
-         
       }).done();
     }
+  componentWillMount(){
+      BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+    }
+    componentWillUnmount() {
+      BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+  }
+  handleBackButtonClick() {
+    this.props.navigation.goBack(null);
+    return true;
+  }
 
   render() {
     return (
@@ -129,7 +132,6 @@ export default class Settings extends Component<Props> {
             title={instructions}
             onSwitch={(value) => this.saveData(value)}
           />
-
         </List>
         </ScrollView>
 </View>

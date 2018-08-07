@@ -62,6 +62,16 @@ export default class ContactDetail extends Component {
                         }
                         if (permission === 'denied') {
                         // x.x
+                        Alert.alert(
+                        'Contacts Permission','eOffice App needs access to your contacts',
+                        [
+                        {text: 'Cancel', onPress: () => console.log('Cancel Button Pressed'), style: 'cancel'},
+                        {text: 'OK', onPress: () => Linking.openURL('app-settings:')},
+                        ]
+                    )
+                       // Linking.openURL('app-settings:');
+
+
                         
                         }
                         
@@ -76,8 +86,8 @@ export default class ContactDetail extends Component {
               const granted = PermissionsAndroid.request(
                 PermissionsAndroid.PERMISSIONS.WRITE_CONTACTS,
                 {
-                  'title': 'Eoffice Contacts Permission',
-                  'message': 'Eoffice App needs access to your contacts '
+                  'title': 'eOffice Contacts Permission',
+                  'message': 'eOffice App needs access to your contacts'
                 }
               )
               if (granted === PermissionsAndroid.RESULTS.GRANTED) {

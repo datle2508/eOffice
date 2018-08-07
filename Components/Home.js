@@ -48,7 +48,7 @@ export default class Home extends Component<Props> {
             department = this.props.navigation.state.params.department;
             phonenumber = this.props.navigation.state.params.phonenumber;
             email = this.props.navigation.state.params.email;
-
+            this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
         this.arrayholder = [] ;
         this.state={Username:'',password:''};
     }
@@ -80,12 +80,15 @@ export default class Home extends Component<Props> {
     //       });
     //     }
     componentWillMount(){
-
-      BackHandler.addEventListener( "hardwareBackPress",function(){
-        return true;
-      });
+      BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
     }
-
+    componentWillUnmount() {
+      BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+  }
+  handleBackButtonClick() {
+    //this.props.navigation.goBack(null);
+    return true;
+}
     logout() {
         Alert.alert(
             'Confirm','Do you want to logout?',
